@@ -39,8 +39,16 @@ async function run() {
         return res.send({ message: "User already exists", insertedId: null });
       }
 
+      // Insert the new user
       const result = await usersCollection.insertOne(user);
-      res.send(result);
+
+      // Fetch the inserted user by ID
+      const newUser = await usersCollection.findOne({ _id: result.insertedId });
+
+      res.send({
+        message: "User created successfully",
+        data: newUser, // Return the full user object
+      });
     });
 
     //users api
@@ -74,11 +82,11 @@ async function run() {
       });
     });
 
-        //currentuser api
-        app.get("/currentUser", async (req, res) => {
-          const result = await usersCollection.find().toArray();
-          res.send(result);
-        });
+    //currentuser api
+    app.get("/currentUser", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
